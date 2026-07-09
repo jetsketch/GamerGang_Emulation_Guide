@@ -24,6 +24,37 @@ Released   : 20140131
 <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900|Quicksand:400,700|Questrial" rel="stylesheet" />
 <link href="default.css" rel="stylesheet" type="text/css" media="all" />
 <link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
+<style>
+.image-clickable {
+  cursor: zoom-in;
+}
+.image-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.image-popup-overlay.active {
+  display: flex;
+}
+.image-popup-content {
+  max-width: 95vw;
+  max-height: 95vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-popup-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+</style>
 
 <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
 
@@ -77,7 +108,7 @@ Released   : 20140131
 </div>
 
 		<p>This is <strong>Amaryllis</strong>, a free, fully standards-compliant CSS template designed by <a href="https://www.tiktok.com/@ganondorf_king_of_evil/video/7641101593470881038" rel="nofollow">TEMPLATED</a>. The photos in this template are from <a href="http://fotogrph.com/"> Fotogrph</a>. This free template is released under the <a href="http://templated.co/license">Creative Commons Attribution</a> license, so you're pretty much free to do whatever you want with it (even use it commercially) provided you give us credit for it. Have fun :) </p>
-	<img src="images/chiyo.png" alt="" class="image" style="height: 200px; width: 700px" />
+		<img src="images/chiyo.png" alt="" class="image image-clickable" data-full-src="images/chiyo.png" style="height: 200px; width: 700px" />
 	</div>
 	<!-- Embedded YouTube video -->
 	<div style="text-align:center; margin:1em 0;">
@@ -168,5 +199,39 @@ Released   : 20140131
 		<li><a href="#" class="icon icon-rss"><span>Pinterest</span></a></li>
 	</ul>
 </div>
+<div id="image-popup-overlay" class="image-popup-overlay" aria-hidden="true">
+	<div class="image-popup-content">
+		<img id="image-popup-img" src="" alt="Expanded image" />
+	</div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const trigger = document.querySelector('.image-clickable[data-full-src]');
+    const overlay = document.getElementById('image-popup-overlay');
+    const popupImg = document.getElementById('image-popup-img');
+
+    if (!trigger || !overlay || !popupImg) return;
+
+    const openPopup = function () {
+      popupImg.src = trigger.dataset.fullSrc;
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closePopup = function () {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      popupImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    };
+
+    trigger.addEventListener('click', openPopup);
+    overlay.addEventListener('click', closePopup);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closePopup();
+    });
+  });
+</script>
 </body>
 </html>
