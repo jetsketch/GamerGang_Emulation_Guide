@@ -25,6 +25,57 @@ Released   : 20140131
 <link href="default.css" rel="stylesheet" type="text/css" media="all" />
 <link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
 
+<style>
+.image-clickable {
+  cursor: zoom-in;
+}
+.image-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.image-popup-overlay.active {
+  display: flex;
+}
+.image-popup-content {
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-popup-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.image-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1001;
+}
+.image-popup-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+</style>
+
 <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
 
 </head>
@@ -61,7 +112,7 @@ Released   : 20140131
 
 <div class="split-container">
   <div class="left-half">
-    <img src="images/roms main page example.png" alt="" class="image" style="height: 270px; width: 480px">
+    <img src="images/roms main page example.png" alt="" class="image" data-full-src="images/roms main page example.png" style="height: 270px; width: 480px">
   </div>
   <div class="right-half">
 	<p>For this example, we'll download Mario Kart Wii (USA)</p>
@@ -77,7 +128,7 @@ Released   : 20140131
 
 <div class="split-container">
   <div class="left-half">
-    <img src="images/minerva page.png" alt="" class="image" style="height: 270px; width: 480px">
+    <img src="images/minerva page.png" alt="" class="image" data-full-src="images/minerva page.png" style="height: 270px; width: 480px">
   </div>
   <div class="right-half">
     <ul style="list-style-type: disc; text-align: left; margin-left: 0; padding-left: 1.2em;">
@@ -200,5 +251,52 @@ Released   : 20140131
 		<li><a href="#" class="icon icon-rss"><span>Pinterest</span></a></li>
 	</ul>
 </div>
+
+<div id="image-popup-overlay" class="image-popup-overlay" aria-hidden="true">
+	<div class="image-popup-content">
+		<button type="button" class="image-popup-close" aria-label="Close image preview">×</button>
+		<img id="image-popup-img" src="" alt="Expanded image" />
+	</div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const triggers = document.querySelectorAll('img.image');
+    const overlay = document.getElementById('image-popup-overlay');
+    const popupImg = document.getElementById('image-popup-img');
+    const closeButton = document.querySelector('.image-popup-close');
+
+    if (!triggers.length || !overlay || !popupImg || !closeButton) return;
+
+    const openPopup = function (event) {
+      const trigger = event.currentTarget;
+      const fullSrc = trigger.dataset.fullSrc || trigger.getAttribute('src');
+      popupImg.src = fullSrc;
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closePopup = function () {
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      popupImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    };
+
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener('click', openPopup);
+    });
+
+    popupImg.addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+    closeButton.addEventListener('click', closePopup);
+    overlay.addEventListener('click', closePopup);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closePopup();
+    });
+  });
+</script>
+
 </body>
 </html>
